@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addHit, cityForTimeZone, countByCity, MAX_HITS, parseHits, simulatedHit, type Hit } from "./visits";
+import { addHit, cityForTimeZone, countByCity, MAX_HITS, parseHits, simulatedHit, type Hit } from "@/lib/visits";
 
 describe("cityForTimeZone", () => {
   it("maps broad regions to the fixed city set", () => {
