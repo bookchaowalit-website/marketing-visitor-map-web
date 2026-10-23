@@ -1,60 +1,45 @@
-# bookchaowalit-visitor-map-frontend — Product brief
+# Visitor Map — Product truth
 
-**Slug:** `bookchaowalit-website/bookchaowalit-visitor-map-frontend`  
-**Generated:** 2026-08-11 (bulk Book Dev closeout)  
-**Status:** starter / portfolio boundary
+> Inferred from the code and copy (no user interview). Checked against the portfolio card claims review
+> (`portfolio-site-web/docs/audits/CARD-CLAIMS-REVIEW-2026-10.md`, row `visitor-map`, evidence Live→Prototype:
+> real-time geolocation plotting, zoom/time-range filters and localisation insights were removed) on 2026-10-23.
 
-## Purpose
+## What it is
 
-Portfolio repository under Book Dev. This brief records ownership and the
-current honest status so the nested tree is not an empty shell in the task
-system.
+A client-only toy map: five fixed cities on an abstract projection, with marks from the visitor's own time zone or
+from a "simulate" button, kept in this browser's `localStorage`.
 
-## Runnable path
+## Who it is for
 
-See `README.md` for install and run instructions when present.
+A portfolio visitor looking at a small, honest data-display UI. It is not an analytics tool.
 
-## Limits
+## What works today
 
-- Not claimed as production-ready unless README and tests prove it.
-- Mobile smoke / emulator acceptance is separate and toolchain-dependent.
+1. "Mark my visit" snaps the browser time zone to the nearest of Bangkok, Tokyo, Berlin, San Francisco or Sydney
+   (legacy zone names and American Atlantic zones included); zones far from all five get an explanatory notice.
+2. "Simulate visitor" adds a random city mark; "Clear field" removes every mark. The newest 40 marks are kept.
+3. Dots on the map and a city register (count per city, how many are yours); selecting a city highlights it.
+4. Stored marks are validated on load: bad JSON, unknown cities and duplicate ids are dropped.
+5. `/api/mcp` answers JSON-RPC (`initialize`, `ping`, `tools/list`, `tools/call`) with one honest `get_app_info` tool;
+   unknown tools and methods return JSON-RPC errors.
+6. Front-end and server errors go to Sentry (errors only, personal data stripped) when `NEXT_PUBLIC_SENTRY_DSN` is set.
 
-<!-- impeccable:product-schema 1 -->
+## What does not work (and must not be claimed)
 
-## Platform
+- No IP or GPS geolocation, no real visitors, no map provider, no zoom or time-range filters, no insights.
+- No account, sharing or sync; clearing site data deletes the marks.
 
-web
+## Live URL and deploy state
 
-## Current product truth
+- Live: https://visitor-map.bookchaowalit.com (HTTP 200 on 2026-10-23).
+- The Vercel project `bookchaowalit-visitor-map-frontend` is deployed by CLI only. Its Git link names the old
+  repository (`bookchaowalit/bookchaowalit-visitor-map-frontend`), so a push to `main` does not deploy. The last
+  production deploy is 2026-10-08 (CLI, commit 3ba2ac9): the CVE patch deploy did not run because Vercel's free plan
+  hit its 100-deployments/day limit on 2026-10-23. The coordinator deploys the latest green `main` after the quota
+  resets; reconnecting Vercel Git to this repository is owner action D9.
+- `NEXT_PUBLIC_SENTRY_DSN` is set on the Vercel project (Sentry project `marketing-visitor-map-web`, org
+  `personal-yu0`); it takes effect on the next deploy.
 
-Inferred from the existing UI and README; user confirmation pending. This is a
-demo map that places simulated visitors from a fixed city list and stores the
-markers in this browser. It has no IP geolocation, live traffic, map provider,
-remote analytics, or geographic accuracy. The map should feel like a visual
-instrument for the simulation, not a live audience claim.
+## Boundaries
 
-## Source README excerpt
-
-```
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize an
-```
+- Browser-only apart from the stateless `/api/mcp` route. The time zone is read in the browser and never sent.
