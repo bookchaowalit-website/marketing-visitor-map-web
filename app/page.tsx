@@ -53,7 +53,7 @@ export default function VisitorMap() {
         </div>
         <div className="atlas-actions">
           <button type="button" className="simulate-button" onClick={markMyVisit}>Mark my visit <b aria-hidden="true">◎</b></button>
-          <button type="button" className="clear-map" onClick={simulateVisitor}>Simulate visitor ＋</button>
+          <button type="button" className="clear-map" onClick={simulateVisitor}>Simulate visitor <b aria-hidden="true">+</b></button>
           <button type="button" className="clear-map" onClick={() => { setHits([]); setSelected(null); setNotice("Field cleared."); }}>Clear field</button>
           <p role="status">{notice || "Mark your own visit (time zone only) or simulate one. Marks stay in this browser."}</p>
         </div>
