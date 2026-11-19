@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
@@ -111,5 +113,40 @@ describe("visitor map", () => {
     mount();
     expect(stats()[3]).toBe("Busiest citySydney2 marks");
     expect(host.querySelectorAll(".ds-row-detail")[0].textContent).toBe("AU · 100% of marks · 1 yours");
+  });
+});
+
+describe("review fixes 2026-11-20", () => {
+  const css = () => readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
+  const rule = (text: string, selector: string) => text.match(new RegExp(`${selector.replace(/[.[\]"=]/g, "\\$&")} \\{[^}]*\\}`))?.[0] ?? "";
+
+  it("moves focus to Mark my visit when Clear marks (which then disables) had it", () => {
+    mount();
+    press(button("Simulate a visitor"));
+    const clear = button("Clear marks");
+    clear.focus();
+    press(clear);
+    expect(clear.disabled).toBe(true);
+    expect(document.activeElement).toBe(button("Mark my visit"));
+  });
+
+  it("starts each city label past the outer edge of the selected ring, at any map width", () => {
+    const text = css();
+    // The selected ring is r 3.4 with a 1-unit stroke: its outer edge is 3.9 units, i.e. 3.9% of the 100-unit-wide map.
+    expect(rule(text, ".vm-map")).toMatch(/container-type: inline-size/);
+    expect(text).toMatch(/--vm-ring-clear: calc\(3\.9cqi \+ 4px\)/);
+    expect(rule(text, ".vm-label")).toMatch(/transform: translate\(-50%, var\(--vm-ring-clear\)\)/);
+    expect(rule(text, '.vm-label[data-side="left"]')).toMatch(/translate\(calc\(-100% - var\(--vm-ring-clear\)\), -50%\)/);
+  });
+
+  it("keeps land, markers and legend keys apart in forced colors", () => {
+    const forced = css().split("@media (forced-colors: active)")[1] ?? "";
+    expect(rule(forced, ".vm-land")).toMatch(/fill: Canvas;/);
+    expect(rule(forced, ".vm-land")).toMatch(/stroke: CanvasText;/);
+    expect(rule(forced, ".vm-self")).toMatch(/fill: CanvasText;/);
+    expect(rule(forced, ".vm-sim")).toMatch(/stroke: CanvasText;/);
+    expect(rule(forced, ".vm-key-self")).toMatch(/forced-color-adjust: none;/);
+    expect(rule(forced, ".vm-key-self")).toMatch(/background: CanvasText;/);
+    expect(rule(forced, ".vm-key-sim")).toMatch(/border-color: CanvasText;/);
   });
 });

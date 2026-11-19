@@ -11,7 +11,9 @@ html, body { margin: 0; background: var(--ds-bg); }
 .vm-key { display: inline-block; width: 14px; height: 14px; border-radius: 50%; }
 .vm-key-self { background: var(--ds-chart); }
 .vm-key-sim { border: 3px solid var(--ds-amber); }
-.vm-map { position: relative; display: grid; overflow: hidden; border: 1px solid var(--ds-line); border-radius: 12px; background: var(--ds-bg); }
+/* Labels start past the outer edge of the selected ring (r 3.4 + half its 1-unit stroke = 3.9 of the map's 100 units,
+   so 3.9% of its width) plus a 4px gap; the map is the container, so the gap follows the drawing's scale. */
+.vm-map { --vm-ring-clear: calc(3.9cqi + 4px); container-type: inline-size; position: relative; display: grid; overflow: hidden; border: 1px solid var(--ds-line); border-radius: 12px; background: var(--ds-bg); }
 .vm-map svg { grid-area: 1 / 1; display: block; width: 100%; height: auto; aspect-ratio: 100 / 84; }
 .vm-land { fill: var(--ds-selected); stroke: var(--ds-field-line); stroke-width: .3; }
 .vm-empty { fill: var(--ds-muted); }
@@ -19,17 +21,24 @@ html, body { margin: 0; background: var(--ds-bg); }
 .vm-sim { fill: none; stroke: var(--ds-amber); stroke-width: 1; }
 .vm-city.selected .vm-sim, .vm-city.selected .vm-empty { stroke: var(--ds-fg); }
 .vm-city.selected .vm-empty { stroke-width: .5; }
-.vm-label { position: absolute; z-index: 1; max-width: 40%; padding: 1px 6px; overflow: hidden; border-radius: 6px; background: color-mix(in srgb, var(--ds-surface) 88%, transparent); color: var(--ds-fg); font-size: 12px; line-height: 16px; text-overflow: ellipsis; transform: translate(-50%, 10px); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.vm-label[data-side="left"] { transform: translate(calc(-100% - 8px), -50%); }
+.vm-label { position: absolute; z-index: 1; max-width: 40%; padding: 1px 6px; overflow: hidden; border-radius: 6px; background: color-mix(in srgb, var(--ds-surface) 88%, transparent); color: var(--ds-fg); font-size: 12px; line-height: 16px; text-overflow: ellipsis; transform: translate(-50%, var(--vm-ring-clear)); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.vm-label[data-side="left"] { transform: translate(calc(-100% - var(--vm-ring-clear)), -50%); }
 .vm-label[data-on="true"] { font-weight: 700; box-shadow: inset 0 0 0 1.5px var(--ds-fg); }
 .vm-empty-state { margin: 0 0 12px; padding: 10px 14px; border: 1px solid var(--ds-line); border-radius: 12px; background: var(--ds-bg); color: var(--ds-fg); font-size: 14px; line-height: 1.45; }
 .vm-controls { display: grid; gap: 8px; min-width: 0; max-width: 100%; }
 .ds-head .vm-status { display: block; max-width: 46ch; margin: 0; color: var(--ds-muted); font-size: 14px; line-height: 1.5; }
 .ds-plain:disabled { color: var(--ds-muted); cursor: not-allowed; }
 .ds-plain:disabled:hover { background: transparent; }
+/* Forced colors: the ground is Canvas with a CanvasText coast, markers are CanvasText, so a marker never sits on
+   ground of its own colour; the legend keys keep the same pair (a forced background would otherwise drop the dot). */
 @media (forced-colors: active) {
-  .vm-self { fill: CanvasText; }
+  .vm-land { fill: Canvas; stroke: CanvasText; }
+  .vm-empty { fill: GrayText; }
+  .vm-self { fill: CanvasText; stroke: Canvas; }
   .vm-sim { stroke: CanvasText; }
+  .vm-city.selected .vm-sim, .vm-city.selected .vm-empty { stroke: Highlight; }
+  .vm-key-self { forced-color-adjust: none; background: CanvasText; }
+  .vm-key-sim { forced-color-adjust: none; border-color: CanvasText; }
   .vm-label[data-on="true"] { outline: 2px solid Highlight; }
 }
 /* Four tiles: two by two on tablets instead of three and an orphan. */

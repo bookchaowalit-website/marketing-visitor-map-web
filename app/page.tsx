@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { DashFoot, DashTop, Pill, Stat } from "@/components/dashboard-shell";
 import { addHit, cityForTimeZone, countByCity, MAX_HITS, parseHits, simulatedHit, type Hit } from "@/lib/visits";
 import { useStoredState } from "@/lib/use-stored-state";
@@ -14,6 +14,8 @@ export default function VisitorMap() {
   const [hits, setHits] = useStoredState(STORAGE_KEY, EMPTY, parseHits);
   const [selected, setSelected] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
+  const markRef = useRef<HTMLButtonElement>(null);
+  const clearRef = useRef<HTMLButtonElement>(null);
   const counts = useMemo(() => countByCity(hits), [hits]);
   const mine = hits.filter((hit) => hit.source === "self").length;
   const busiest = counts[0]?.count ? counts[0] : null;
@@ -36,6 +38,8 @@ export default function VisitorMap() {
   }
 
   function clearMarks() {
+    // Clear disables itself once nothing is left; focus moves to Mark my visit instead of falling to the page.
+    if (document.activeElement === clearRef.current) markRef.current?.focus();
     setHits([]);
     setSelected(null);
     setNotice("All marks cleared.");
@@ -55,9 +59,9 @@ export default function VisitorMap() {
           {/* The result of a press is read right under the buttons, so on a phone it is on screen without scrolling. */}
           <div className="vm-controls">
             <div className="ds-actions">
-              <button type="button" className="ds-button" onClick={markMyVisit}>Mark my visit</button>
+              <button ref={markRef} type="button" className="ds-button" onClick={markMyVisit}>Mark my visit</button>
               <button type="button" className="ds-plain" onClick={simulateVisitor}>Simulate a visitor</button>
-              <button type="button" className="ds-plain" onClick={clearMarks} disabled={hits.length === 0}>Clear marks</button>
+              <button ref={clearRef} type="button" className="ds-plain" onClick={clearMarks} disabled={hits.length === 0}>Clear marks</button>
             </div>
             <p className="vm-status" role="status">{notice || "Marks stay in this browser and nowhere else."}</p>
           </div>
