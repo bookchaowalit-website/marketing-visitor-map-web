@@ -50,4 +50,6 @@ A portfolio visitor looking at a small, honest data-display UI. It is not an ana
   label shows the name without a count, and the city list says "no marks yet" (2026-11-20 review P3, left as is).
 - On screens 480px wide or less only the selected city's label shows on the map (five labels cannot fit there
   without overlapping); the city list, first on phones, names every city and its count.
+- The one-label rule follows the viewport width (480px), not the text size: with text enlarged to 200% on a screen just
+  over 480px, two labels (San Francisco and Berlin) can overlap (Codex report -71ca7e7e81, P3).
 - The app is frozen after the 2026-11-20 review round; later findings go here instead of into code.

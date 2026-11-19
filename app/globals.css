@@ -27,7 +27,6 @@ html, body { margin: 0; background: var(--ds-bg); }
 .vm-label[data-side="below-start"] { transform: translate(0, var(--vm-ring-clear)); }
 .vm-label[data-on="true"] { font-weight: 700; box-shadow: inset 0 0 0 1.5px var(--ds-fg); }
 .vm-empty-state { margin: 0 0 12px; padding: 10px 14px; border: 1px solid var(--ds-line); border-radius: 12px; background: var(--ds-bg); color: var(--ds-fg); font-size: 14px; line-height: 1.45; }
-.vm-nowrap { white-space: nowrap; }
 .vm-controls { display: grid; gap: 8px; min-width: 0; max-width: 100%; }
 .ds-head .vm-status { display: block; max-width: 46ch; margin: 0; color: var(--ds-muted); font-size: 14px; line-height: 1.5; }
 .ds-plain:disabled { color: var(--ds-muted); cursor: not-allowed; }

@@ -191,4 +191,10 @@ describe("review fixes 2026-11-20", () => {
     const panels = [...grid.querySelectorAll(":scope > section")].map((section) => section.getAttribute("aria-labelledby"));
     expect(panels).toEqual(["cities-heading", "map-heading"]);
   });
+
+  it("lets every note wrap (no nowrap span), so 200% text at 320px never scrolls sideways", () => {
+    mount();
+    expect(host.querySelector(".ds-note .vm-nowrap")).toBeNull();
+    expect(readFileSync(join(process.cwd(), "app/globals.css"), "utf8")).not.toMatch(/\.vm-nowrap/);
+  });
 });

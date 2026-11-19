@@ -176,7 +176,7 @@ export default function VisitorMap() {
 
         <p className="ds-note">Your mark uses only the browser time zone, snapped to the nearest of five listed cities. There is no IP lookup, map provider or remote analytics, and no geographic accuracy.</p>
         <p className="ds-note">The time zone is read to pick a city and is not saved. Only your marks are saved, in this browser&apos;s storage, and this page does not send them anywhere.</p>
-        <p className="ds-note">If error reporting is turned on, errors go to Sentry with request details <span className="vm-nowrap">(headers, cookies, query)</span>, user, breadcrumbs, extra data and stack-frame variables removed, and query strings cut from error text. The error message and stack are still sent.</p>
+        <p className="ds-note">If error reporting is turned on, errors go to Sentry with request details (headers, cookies, query), user, breadcrumbs, extra data and stack-frame variables removed, and query strings cut from error text. The error message and stack are still sent.</p>
       </main>
 
       <DashFoot source={SOURCE} />
