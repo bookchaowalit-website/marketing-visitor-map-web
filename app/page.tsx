@@ -89,7 +89,45 @@ export default function VisitorMap() {
           <Stat label="Busiest city" value={busiest ? busiest.city : "—"} note={busiest ? plural(busiest.count, "mark") : "no marks yet"} />
         </ul>
 
-        <div className="ds-grid">
+        {/* The city picker leads on phones (one column) and takes the narrow column on wide screens (DASHBOARD.md). */}
+        <div className="ds-grid ds-grid-narrow-first">
+          <section className="ds-panel" aria-labelledby="cities-heading">
+            <div className="ds-panel-head">
+              <div>
+                <h2 id="cities-heading">Cities</h2>
+                <p>Marks per city, busiest first · select one to highlight it</p>
+              </div>
+            </div>
+            <ul className="ds-rows">
+              {counts.map((city) => {
+                const share = hits.length ? Math.round((city.count / hits.length) * 100) : 0;
+                return (
+                  <li key={city.city}>
+                    <button type="button" className="ds-row" aria-pressed={selected === city.city} onClick={() => setSelected(city.city)}>
+                      <span className="ds-row-name">{city.city}</span>
+                      <span className="ds-row-detail">{city.country} · {city.count ? `${share}% of marks${city.self ? ` · ${city.self} yours` : ""}` : "no marks yet"}</span>
+                      <span className="ds-row-value">{city.count}</span>
+                      <span className="ds-meter" aria-hidden="true"><span style={{ width: `${share}%` }} /></span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="ds-callout" aria-live="polite">
+              {chosen ? (
+                <>
+                  <strong>{chosen.city}, {chosen.country}</strong>
+                  <span>{chosen.count ? `${plural(chosen.count, "mark")}: ${chosen.self} yours, ${chosen.count - chosen.self} simulated.` : "No marks here yet."}</span>
+                </>
+              ) : (
+                <>
+                  <strong>No city selected</strong>
+                  <span>Select a city to highlight it on the map.</span>
+                </>
+              )}
+            </div>
+          </section>
+
           <section className="ds-panel" aria-labelledby="map-heading">
             <div className="ds-panel-head">
               <div>
@@ -134,47 +172,11 @@ export default function VisitorMap() {
               })}
             </div>
           </section>
-
-          <section className="ds-panel" aria-labelledby="cities-heading">
-            <div className="ds-panel-head">
-              <div>
-                <h2 id="cities-heading">Cities</h2>
-                <p>Marks per city, busiest first · select one to highlight it</p>
-              </div>
-            </div>
-            <ul className="ds-rows">
-              {counts.map((city) => {
-                const share = hits.length ? Math.round((city.count / hits.length) * 100) : 0;
-                return (
-                  <li key={city.city}>
-                    <button type="button" className="ds-row" aria-pressed={selected === city.city} onClick={() => setSelected(city.city)}>
-                      <span className="ds-row-name">{city.city}</span>
-                      <span className="ds-row-detail">{city.country} · {city.count ? `${share}% of marks${city.self ? ` · ${city.self} yours` : ""}` : "no marks yet"}</span>
-                      <span className="ds-row-value">{city.count}</span>
-                      <span className="ds-meter" aria-hidden="true"><span style={{ width: `${share}%` }} /></span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="ds-callout" aria-live="polite">
-              {chosen ? (
-                <>
-                  <strong>{chosen.city}, {chosen.country}</strong>
-                  <span>{chosen.count ? `${plural(chosen.count, "mark")}: ${chosen.self} yours, ${chosen.count - chosen.self} simulated.` : "No marks here yet."}</span>
-                </>
-              ) : (
-                <>
-                  <strong>No city selected</strong>
-                  <span>Select a city to highlight it on the map.</span>
-                </>
-              )}
-            </div>
-          </section>
         </div>
 
         <p className="ds-note">Your mark uses only the browser time zone, snapped to the nearest of five listed cities. There is no IP lookup, map provider or remote analytics, and no geographic accuracy.</p>
-        <p className="ds-note">Your marks and your time zone stay in this browser&apos;s storage and are not sent by this page. If error reporting is turned on, errors go to Sentry with personal data removed.</p>
+        <p className="ds-note">The time zone is read to pick a city and is not saved. Only your marks are saved, in this browser&apos;s storage, and this page does not send them anywhere.</p>
+        <p className="ds-note">If error reporting is turned on, errors go to Sentry with request details <span className="vm-nowrap">(headers, cookies, query)</span>, user, breadcrumbs, extra data and stack-frame variables removed, and query strings cut from error text. The error message and stack are still sent.</p>
       </main>
 
       <DashFoot source={SOURCE} />

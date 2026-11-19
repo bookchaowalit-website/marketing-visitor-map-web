@@ -153,8 +153,11 @@ describe("review fixes 2026-11-20", () => {
   it("limits the privacy note to what this page stores, and names error reports apart", () => {
     const html = renderToString(<VisitorMap />);
     expect(html).not.toContain("nothing leaves this browser");
-    expect(html).toContain("Your marks and your time zone stay in this browser&#x27;s storage and are not sent by this page.");
-    expect(html).toContain("If error reporting is turned on, errors go to Sentry with personal data removed.");
+    expect(html).not.toContain("personal data removed");
+    expect(html).toContain("The time zone is read to pick a city and is not saved. Only your marks are saved, in this browser&#x27;s storage, and this page does not send them anywhere.");
+    mount();
+    const notes = [...host.querySelectorAll(".ds-note")].map((note) => note.textContent);
+    expect(notes).toContain("If error reporting is turned on, errors go to Sentry with request details (headers, cookies, query), user, breadcrumbs, extra data and stack-frame variables removed, and query strings cut from error text. The error message and stack are still sent.");
   });
 
   it("places each city label on a side away from the other pins, inside the map at any width", () => {
@@ -173,5 +176,19 @@ describe("review fixes 2026-11-20", () => {
     const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
     expect(css).toMatch(/\.vm-label\[data-side="above"\] \{ transform: translate\(-50%, calc\(-100% - var\(--vm-ring-clear\)\)\); \}/);
     expect(css).toMatch(/\.vm-label\[data-side="below-start"\] \{ transform: translate\(0, var\(--vm-ring-clear\)\); \}/);
+  });
+
+  it("shows only the selected city's label on narrow screens, so labels never overlap", () => {
+    const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
+    const narrow = css.split("@media (max-width: 480px)")[1] ?? "";
+    expect(narrow).toMatch(/^\s*\{\s*\.vm-label:not\(\[data-on="true"\]\) \{ display: none; \}/);
+  });
+
+  it("puts the city picker before the map, in the narrow column on wide screens", () => {
+    mount();
+    const grid = $(".ds-grid")!;
+    expect(grid.classList.contains("ds-grid-narrow-first")).toBe(true);
+    const panels = [...grid.querySelectorAll(":scope > section")].map((section) => section.getAttribute("aria-labelledby"));
+    expect(panels).toEqual(["cities-heading", "map-heading"]);
   });
 });
