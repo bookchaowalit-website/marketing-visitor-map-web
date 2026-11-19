@@ -8,6 +8,21 @@ import { useStoredState } from "@/lib/use-stored-state";
 const STORAGE_KEY = "book-visitor-map-v2";
 const EMPTY: Hit[] = [];
 const SOURCE = "https://github.com/bookchaowalit-website/marketing-visitor-map-web";
+/**
+ * Where each fixed city's label sits, picked so it never covers another city's ring and stays inside the map:
+ * San Francisco (18%) starts at the left edge below its pin; Tokyo goes above, away from Bangkok's ring; Bangkok and
+ * Sydney go left, into open ground.
+ */
+type LabelSide = "below" | "above" | "left" | "below-start";
+const LABEL_SIDE: Record<string, LabelSide> = { "San Francisco": "below-start", Berlin: "below", Tokyo: "above", Bangkok: "left", Sydney: "left" };
+const LABEL_MAX = 40;
+// The ring's outer edge is 3.9% of the map width from the pin; 1% more keeps a gap at the map edge.
+function labelBox(side: LabelSide, x: number): { left: number; maxWidth: number } {
+  // Open ground below and right of San Francisco, so its label may run wider than the others.
+  if (side === "below-start") return { left: 2, maxWidth: 60 };
+  if (side === "left") return { left: x, maxWidth: Math.min(LABEL_MAX, x - 4.9) };
+  return { left: x, maxWidth: Math.min(LABEL_MAX, 2 * Math.min(x, 100 - x) - 2) };
+}
 const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
 
 export default function VisitorMap() {
@@ -108,11 +123,15 @@ export default function VisitorMap() {
                   );
                 })}
               </svg>
-              {counts.map((city) => (
-                <span key={city.city} className="vm-label" data-on={selected === city.city} data-side={city.y > 66 ? "left" : undefined} style={{ left: `${city.x}%`, top: `${(city.y / 84) * 100}%` }} aria-hidden="true">
-                  {city.city}{city.count ? ` · ${city.count}` : ""}
-                </span>
-              ))}
+              {counts.map((city) => {
+                const side = LABEL_SIDE[city.city] ?? "below";
+                const box = labelBox(side, city.x);
+                return (
+                  <span key={city.city} className="vm-label" data-on={selected === city.city} data-side={side === "below" ? undefined : side} style={{ left: `${box.left}%`, top: `${(city.y / 84) * 100}%`, maxWidth: `${box.maxWidth}%` }} aria-hidden="true">
+                    {city.city}{city.count ? ` · ${city.count}` : ""}
+                  </span>
+                );
+              })}
             </div>
           </section>
 
@@ -154,7 +173,8 @@ export default function VisitorMap() {
           </section>
         </div>
 
-        <p className="ds-note">Your mark uses only the browser time zone, snapped to the nearest of five listed cities. No IP lookup, map provider, remote analytics or geographic accuracy is involved, and nothing leaves this browser.</p>
+        <p className="ds-note">Your mark uses only the browser time zone, snapped to the nearest of five listed cities. There is no IP lookup, map provider or remote analytics, and no geographic accuracy.</p>
+        <p className="ds-note">Your marks and your time zone stay in this browser&apos;s storage and are not sent by this page. If error reporting is turned on, errors go to Sentry with personal data removed.</p>
       </main>
 
       <DashFoot source={SOURCE} />

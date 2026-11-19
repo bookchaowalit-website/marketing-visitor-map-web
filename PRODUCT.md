@@ -43,3 +43,9 @@ A portfolio visitor looking at a small, honest data-display UI. It is not an ana
 ## Boundaries
 
 - Browser-only apart from the stateless `/api/mcp` route. The time zone is read in the browser and never sent.
+
+## Known limits
+
+- A city with no marks is drawn as a small filled dot, which can read like the "your visit" dot in the legend; its map
+  label shows the name without a count, and the city list says "no marks yet" (2026-11-20 review P3, left as is).
+- The app is frozen after the 2026-11-20 review round; later findings go here instead of into code.

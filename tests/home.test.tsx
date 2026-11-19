@@ -39,7 +39,7 @@ describe("visitor map", () => {
     expect(html).toContain("Where visits were marked");
     expect(html).toContain("Not live analytics");
     for (const city of CITIES) expect(html).toContain(city.city);
-    expect(html).toContain("No IP lookup, map provider, remote analytics or geographic accuracy is involved");
+    expect(html).toContain("There is no IP lookup, map provider or remote analytics");
     expect(html).toContain('href="https://bookchaowalit.com/"');
   });
 
@@ -148,5 +148,30 @@ describe("review fixes 2026-11-20", () => {
     expect(rule(forced, ".vm-key-self")).toMatch(/forced-color-adjust: none;/);
     expect(rule(forced, ".vm-key-self")).toMatch(/background: CanvasText;/);
     expect(rule(forced, ".vm-key-sim")).toMatch(/border-color: CanvasText;/);
+  });
+
+  it("limits the privacy note to what this page stores, and names error reports apart", () => {
+    const html = renderToString(<VisitorMap />);
+    expect(html).not.toContain("nothing leaves this browser");
+    expect(html).toContain("Your marks and your time zone stay in this browser&#x27;s storage and are not sent by this page.");
+    expect(html).toContain("If error reporting is turned on, errors go to Sentry with personal data removed.");
+  });
+
+  it("places each city label on a side away from the other pins, inside the map at any width", () => {
+    mount();
+    const sides = Object.fromEntries([...host.querySelectorAll<HTMLElement>(".vm-label")].map((label) => [label.textContent?.split(" ·")[0], label.dataset.side ?? "below"]));
+    expect(sides).toEqual({ "San Francisco": "below-start", Berlin: "below", Tokyo: "above", Bangkok: "left", Sydney: "left" });
+    // Every label's box stays inside the map: its max-width fits the room on its side (a 3.9% ring edge + 1% gap).
+    for (const label of host.querySelectorAll<HTMLElement>(".vm-label")) {
+      const x = parseFloat(label.style.left);
+      const max = parseFloat(label.style.maxWidth);
+      const side = label.dataset.side ?? "below";
+      if (side === "left") expect(x - 4.9 - max).toBeGreaterThanOrEqual(0);
+      else if (side === "below-start") expect(x + max).toBeLessThanOrEqual(100);
+      else expect(Math.min(x, 100 - x) * 2).toBeGreaterThanOrEqual(max);
+    }
+    const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
+    expect(css).toMatch(/\.vm-label\[data-side="above"\] \{ transform: translate\(-50%, calc\(-100% - var\(--vm-ring-clear\)\)\); \}/);
+    expect(css).toMatch(/\.vm-label\[data-side="below-start"\] \{ transform: translate\(0, var\(--vm-ring-clear\)\); \}/);
   });
 });
