@@ -91,6 +91,21 @@ describe("visitor map", () => {
     expect($(".ds-callout")?.textContent).toContain("No city selected");
   });
 
+  it("reads the result right under the buttons and keeps the empty note out of the map drawing", () => {
+    mount();
+    // The status sits with the buttons in the head, so a phone shows it without scrolling to the map.
+    const status = $('[role="status"]');
+    expect(status?.closest(".vm-controls")?.querySelector(".ds-actions")?.contains(button("Mark my visit"))).toBe(true);
+    expect(status?.closest(".ds-head")).not.toBeNull();
+    expect(host.querySelectorAll('[role="status"]')).toHaveLength(1);
+    // The empty note comes before the map box, not inside it over the markers and city labels.
+    const note = $(".vm-empty-state");
+    const map = $(".vm-map");
+    expect(note?.closest(".vm-map")).toBeNull();
+    expect(note?.nextElementSibling).toBe(map);
+    expect(map?.querySelector(".vm-empty-state")).toBeNull();
+  });
+
   it("restores saved marks from this browser", () => {
     window.localStorage.setItem(KEY, JSON.stringify([{ city: "Sydney", id: "a", source: "self" }, { city: "Sydney", id: "b", source: "simulated" }]));
     mount();

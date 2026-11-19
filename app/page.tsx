@@ -52,10 +52,14 @@ export default function VisitorMap() {
             <h1>Where visits were marked</h1>
             <p>Your own visit by time zone, plus simulated ones <Pill tone="grey">Not live analytics</Pill></p>
           </div>
-          <div className="ds-actions">
-            <button type="button" className="ds-button" onClick={markMyVisit}>Mark my visit</button>
-            <button type="button" className="ds-plain" onClick={simulateVisitor}>Simulate a visitor</button>
-            <button type="button" className="ds-plain" onClick={clearMarks} disabled={hits.length === 0}>Clear marks</button>
+          {/* The result of a press is read right under the buttons, so on a phone it is on screen without scrolling. */}
+          <div className="vm-controls">
+            <div className="ds-actions">
+              <button type="button" className="ds-button" onClick={markMyVisit}>Mark my visit</button>
+              <button type="button" className="ds-plain" onClick={simulateVisitor}>Simulate a visitor</button>
+              <button type="button" className="ds-plain" onClick={clearMarks} disabled={hits.length === 0}>Clear marks</button>
+            </div>
+            <p className="vm-status" role="status">{notice || "Marks stay in this browser and nowhere else."}</p>
           </div>
         </div>
 
@@ -78,6 +82,10 @@ export default function VisitorMap() {
               <li><span className="vm-key vm-key-self" aria-hidden="true" />Your visit (filled dot)</li>
               <li><span className="vm-key vm-key-sim" aria-hidden="true" />Simulated (ring)</li>
             </ul>
+            {/* Above the drawing, not over it, so it never hides a marker or a highlighted city label. */}
+            {hits.length === 0 ? (
+              <p className="vm-empty-state">No marks yet. Press <strong>Mark my visit</strong> above to place yours, or simulate a visitor.</p>
+            ) : null}
             <div className="vm-map">
               <svg viewBox="0 0 100 84" role="img" aria-label={hits.length ? `Map with ${plural(hits.length, "mark")}: ${counts.filter((c) => c.count).map((c) => `${c.city} ${c.count}`).join(", ")}.` : "Map with no marks yet."}>
                 <path className="vm-land" d="M8 21 C15 12 28 12 33 18 L39 25 34 31 28 29 23 35 16 31 10 34 5 28Z" />
@@ -101,11 +109,7 @@ export default function VisitorMap() {
                   {city.city}{city.count ? ` · ${city.count}` : ""}
                 </span>
               ))}
-              {hits.length === 0 ? (
-                <p className="vm-empty-state">No marks yet. Press <strong>Mark my visit</strong> above to place yours, or simulate a visitor.</p>
-              ) : null}
             </div>
-            <p className="vm-status" role="status">{notice || "Marks stay in this browser and nowhere else."}</p>
           </section>
 
           <section className="ds-panel" aria-labelledby="cities-heading">
