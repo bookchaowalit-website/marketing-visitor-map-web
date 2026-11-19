@@ -10,7 +10,7 @@ Live: https://visitor-map.bookchaowalit.com (deployed by Vercel CLI; it can lag 
 
 - "Mark my visit" maps the browser time zone (including legacy names and Atlantic zones) to the nearest of Bangkok,
   Tokyo, Berlin, San Francisco or Sydney; other zones get a clear "not near any city" notice.
-- "Simulate visitor" adds a random mark; "Clear field" removes all. The newest 40 marks are kept in `localStorage`
+- "Simulate a visitor" adds a random mark; "Clear marks" removes all. The newest 40 marks are kept in `localStorage`
   and validated on load (bad JSON, unknown cities and duplicate ids dropped).
 - The city register counts marks per city (and how many are yours) and highlights a city on the map.
 
@@ -51,4 +51,5 @@ scan on every push and PR to `main`.
   marks live only in the visitor's browser, so there is nothing else to serve).
 - `lib/site.ts`: canonical URL, robots and sitemap.
 - `lib/sentry.ts` + `instrumentation*.ts`: error reporting to Sentry, errors only, personal data stripped.
-- `lib/related-projects.ts` + `app/more-projects/page.tsx`: portfolio link page (copied per repository, not a package).
+- `/more-projects` is a permanent (308) redirect to https://bookchaowalit.com/ (`next.config.ts`); the footer links there too.
+- `app/dashboard-shell.css`, `components/dashboard-shell.tsx`, `components/dashboard-chart.tsx`: the shared Dashboard shell, copied in (see `DASHBOARD.md`).

@@ -17,7 +17,7 @@ A portfolio visitor looking at a small, honest data-display UI. It is not an ana
 
 1. "Mark my visit" snaps the browser time zone to the nearest of Bangkok, Tokyo, Berlin, San Francisco or Sydney
    (legacy zone names and American Atlantic zones included); zones far from all five get an explanatory notice.
-2. "Simulate visitor" adds a random city mark; "Clear field" removes every mark. The newest 40 marks are kept.
+2. "Simulate a visitor" adds a random city mark; "Clear marks" removes every mark. The newest 40 marks are kept.
 3. Dots on the map and a city register (count per city, how many are yours); selecting a city highlights it.
 4. Stored marks are validated on load: bad JSON, unknown cities and duplicate ids are dropped.
 5. `/api/mcp` answers JSON-RPC (`initialize`, `ping`, `tools/list`, `tools/call`) with one honest `get_app_info` tool;
